@@ -1,0 +1,10 @@
+.trading-view-page {
+  height: 100vh;
+  padding-top: 13px; /* Same as navbar height */
+  box-sizing: border-box;
+}
+
+.chart-container {
+  height: calc(100vh - 13px); /* Remaining space */
+  overflow: hidden;
+}
