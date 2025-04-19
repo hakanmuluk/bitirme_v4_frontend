@@ -20,7 +20,7 @@ const Chatbot: React.FC = () => {
 
   // 2) once ready, point iframe at the real Chainlit UI
   const iframeSrc = ready
-    ? `${chainlitHost}/chainlit`   // this is your mounted Chainlit app
+    ? `${chainlitHost}/chainlit/`   // this is your mounted Chainlit app
     : "about:blank";
 
   return (
