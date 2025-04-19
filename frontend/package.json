@@ -3,13 +3,20 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+
+  "scripts": {
+    "dev": "vite",           // local development  →  npm run dev
+    "build": "vite build",   // Railway uses this  →  npm run build
+    "preview": "vite preview"
+  },
+
   "devDependencies": {
     "@types/node": "^22.10.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@types/react-router-dom": "^5.3.3",
     "@vitejs/plugin-react": "^4.3.4",
-    "serve": "^14.2.4",
+    "serve": "^14.2.4",      // serve will run in the Procfile/Start Cmd
     "typescript": "^5.7.2",
     "vite": "^6.0.1"
   },
