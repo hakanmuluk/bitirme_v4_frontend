@@ -1,88 +1,94 @@
-import React from "react";
-import { Menu } from "antd";
-import { BarChartOutlined, SettingOutlined, UserOutlined } from "@ant-design/icons";
+import React, { useState } from "react";
+import { Menu, Drawer, Grid } from "antd";
+import {
+  BarChartOutlined,
+  SettingOutlined,
+  UserOutlined,
+  MenuOutlined,
+} from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import "./Navbar.css";
 
+const { useBreakpoint } = Grid;
+
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const screens = useBreakpoint();
+  const [drawerVisible, setDrawerVisible] = useState(false);
 
-  // Determine the active key based on the current path.
-  let activeKey = "markets"; // default key
-  if (location.pathname.startsWith("/chatbot")) {
-    activeKey = "chatbot";
-  } else if (location.pathname.startsWith("/news")) {
-    activeKey = "news";
-  } else if (location.pathname.startsWith("/screener")) {
-    activeKey = "markets";
-  }
-  // You can adjust or extend these conditions as needed.
+  let activeKey = "markets";
+  if (location.pathname.startsWith("/chatbot")) activeKey = "chatbot";
+  else if (location.pathname.startsWith("/news")) activeKey = "news";
+  else if (location.pathname.startsWith("/screener")) activeKey = "markets";
 
   const handleMenuClick = async ({ key }: { key: string }) => {
     if (key === "profile-logout") {
-      try {
-        await axios.post("https://investmenthelper-ai-backend.up.railway.app/api/logout", {
-          withCredentials: true,
-        });
-        // Clear the username from localStorage on logout
-        localStorage.removeItem("email");
-        navigate("/login");
-      } catch (error) {
-        console.error("Logout error", error);
-      }
+      await axios.post(
+        "https://investmenthelper-ai-backend.up.railway.app/api/logout",
+        {},
+        { withCredentials: true }
+      );
+      localStorage.removeItem("email");
+      navigate("/login");
     } else {
-      // Map keys to their routes.
-      const routeMap: { [key: string]: string } = {
+      const routeMap: Record<string, string> = {
         chatbot: "/chatbot",
         news: "/news",
         markets: "/screener",
       };
-      if (routeMap[key]) {
-        navigate(routeMap[key]);
-      }
+      if (routeMap[key]) navigate(routeMap[key]);
+      setDrawerVisible(false);
     }
   };
 
   const items = [
-    {
-      key: "chatbot",
-      icon: <SettingOutlined />,
-      label: "Chatbot",
-    },
-    {
-      key: "markets",
-      icon: <BarChartOutlined />,
-      label: "Markets",
-    },
+    { key: "chatbot", icon: <SettingOutlined />, label: "Chatbot" },
+    { key: "markets", icon: <BarChartOutlined />, label: "Markets" },
     {
       key: "profile",
       icon: <UserOutlined />,
       label: "Profile",
-      children: [
-        {
-          key: "profile-logout",
-          label: "Logout",
-        },
-      ],
+      children: [{ key: "profile-logout", label: "Logout" }],
     },
   ];
 
   return (
     <div className="navbar">
       <div className="navbar-logo">
-        Investment<span className="navbar-highlight">Helper-AI</span>
+        Investment<span className="navbar-highlight">Helper‑AI</span>
       </div>
-      <Menu
-        mode="horizontal"
-        defaultSelectedKeys={[activeKey]}
-        selectedKeys={[activeKey]}
-        className="navbar-menu"
-        items={items}
-        onClick={handleMenuClick}
-        overflowedIndicator={null}
-      />
+
+      {screens.md ? (
+        <Menu
+          mode="horizontal"
+          selectedKeys={[activeKey]}
+          className="navbar-menu"
+          items={items}
+          onClick={handleMenuClick}
+        />
+      ) : (
+        <>
+          <MenuOutlined
+            className="navbar-hamburger"
+            onClick={() => setDrawerVisible(true)}
+          />
+          <Drawer
+            placement="right"
+            onClose={() => setDrawerVisible(false)}
+            open={drawerVisible}
+            bodyStyle={{ padding: 0 }}
+          >
+            <Menu
+              mode="vertical"
+              selectedKeys={[activeKey]}
+              items={items}
+              onClick={handleMenuClick}
+            />
+          </Drawer>
+        </>
+      )}
     </div>
   );
 };
