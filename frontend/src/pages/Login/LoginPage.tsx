@@ -39,7 +39,7 @@ const LoginPage: React.FC = () => {
           name="login-form"
           onFinish={onFinish}
           layout="vertical"
-          style={{ width: "300px" }}
+          className="login-form"
         >
           <Form.Item
             label="Email"
