@@ -1,0 +1,26 @@
+/* frontend/src/pages/ChatbotPage/ChatbotPage.css */
+@import '../../global.css'; /* for --navbar-height */
+
+.chatbot-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding-top: var(--navbar-height);  /* push content below fixed navbar */
+  margin: 0;
+  box-sizing: border-box;
+}
+
+/* no need to target .navbar here since it’s fixed-positioned */
+
+/* Iframe container fills remaining space */
+.chatbot-content {
+  flex: 1 1 auto;
+  width: 100%;
+  position: relative;
+}
+
+.chatbot-content iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
