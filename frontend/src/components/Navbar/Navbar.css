@@ -1,70 +1,67 @@
+/* Navbar.css */
+
 .navbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%; /* Full width */
-  height: 60px; /* Fixed height */
-  padding: 0 16px;
-  background-color: #ffffff; /* White navbar background */
-  z-index: 15;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  font-family: "Poppins", sans-serif; /* Ensure consistent font *//* Stronger shadow for contrast */
+  right: 0;
+  height: var(--navbar-height); 
+  padding: 0 var(--spacing-medium);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--color-white);
+  box-shadow: var(--box-shadow-light);
+  z-index: 1000;
 }
 
 .navbar-logo {
-  font-size: 1.8rem; /* Slightly larger logo font */
-  font-weight: 700; /* Make the logo bold */
-  color: #0078d4; /* Primary blue color */
+  font-size: clamp(1.5rem, 2.5vw, var(--font-size-heading));
+  font-weight: 700;
+  color: var(--color-primary);
   letter-spacing: 0.5px;
 }
 
 .navbar-menu {
-  flex-grow: 1; /* Allow menu to occupy available space */
-  display: flex; /* Ensure menu items are aligned horizontally */
-  justify-content: flex-end; /* Align items to the right */
-  gap: 16px; /* Add spacing between menu items */
-  padding-right: clamp(8px, 2%, 24px); /* Prevent items from being hidden */
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--spacing-medium);
+  overflow-x: auto;            /* allow scroll if items exceed width */
+  -webkit-overflow-scrolling: touch;
 }
+
+/* Antd overrides, using CSS variables */
 
 .ant-menu-horizontal {
-  background: transparent; /* Remove default menu background */
-  border-bottom: none; /* Remove default underline */
+  background: transparent;
+  border-bottom: none;
 }
 
-.ant-menu-item {
-  padding: 8px 16px; /* Consistent padding for clickable area */
-  color: #444444; /* Dark gray color for default state */
-  font-size: 1rem; /* Base font size */
-  font-weight: 500; /* Semi-bold for visibility */
-  font-family: "Poppins", sans-serif;
-  transition: color 0.3s ease, background-color 0.3s ease; /* Smooth hover transition */
-}
-
-.ant-menu-item:hover {
-  color: #0078d4; /* Primary blue color on hover */
-  background-color: rgba(0, 120, 212, 0.1); /* Light blue hover background */
-  border-radius: 4px; /* Rounded edges for hover effect */
-}
-.ant-menu-item-selected {
-  color: #005bb5; /* Slightly darker blue for selected item */
-  font-weight: 700; /* Make selected item bold */
-}
-
+.ant-menu-item,
 .ant-menu-submenu-title {
-  display: flex;
-  align-items: center;
-  justify-content: center; /* centers content horizontally */
-  height: 60px; /* match your navbar's height */
-  padding: 0 16px; /* adjust as needed */
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  color: var(--color-dark-gray);
+  transition: color 0.3s, background-color 0.3s;
 }
 
+.ant-menu-item:hover,
+.ant-menu-submenu-title:hover {
+  color: var(--color-primary);
+  background-color: rgba(0, 120, 212, 0.1);
+  border-radius: 4px;
+}
 
+.ant-menu-item-selected {
+  color: #005bb5;    /* slightly darker blue for selected */
+  font-weight: 700;
+}
 
-
-/* Optional: If you see extra margin or padding, you can reset it */
-.ant-menu-submenu-title > span {
-  line-height: 60px;
+.navbar-hamburger {
+  font-size: 1.5rem;
+  color: var(--color-dark-gray);
+  cursor: pointer;
 }
