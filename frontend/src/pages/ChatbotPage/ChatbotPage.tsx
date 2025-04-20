@@ -24,7 +24,7 @@ const Chatbot: React.FC = () => {
       .catch(console.error);
   }, [username]);
 
-  const iframeSrc = ready ? `${chainlitHost}/chainlit` : "about:blank";
+  const iframeSrc = ready ? `${chainlitHost}/chainlit/` : "about:blank";
 
   return (
     <div className="chatbot-page">
