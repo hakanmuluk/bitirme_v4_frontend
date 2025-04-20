@@ -33,12 +33,27 @@
 
   /* Border */
   --border-radius: 12px;
+
+  --navbar-height: clamp(48px, 8vh, 64px);
 }
 
-html, body {
+/* Universal box-sizing */
+html {
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+/* Global reset and responsive scrolling */
+body {
   margin: 0;
   padding: 0;
-  height: 100%; /* Ensure body takes full viewport height */
-  overflow: hidden; /* Prevent scrollbars caused by body overflow */
-  box-sizing: border-box; /* Ensure consistent box sizing */
+  min-height: 100vh;     /* Flexible full-viewport height */
+  overflow-x: hidden;    /* Prevent unwanted horizontal scroll */
+  overflow-y: auto;      /* Enable vertical scroll when needed */
+  font-family: var(--font-family);
+  background-color: var(--color-background);
+  color: var(--color-black);
 }
