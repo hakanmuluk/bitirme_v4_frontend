@@ -1,5 +1,7 @@
+// frontend/src/pages/Chatbot/Chatbot.tsx
 import React, { useEffect, useState } from "react";
 import Navbar from "../../components/Navbar/Navbar";
+import "./Chatbot.css";
 
 const Chatbot: React.FC = () => {
   const username = localStorage.getItem("email");
@@ -8,34 +10,34 @@ const Chatbot: React.FC = () => {
 
   useEffect(() => {
     if (!username) return;
-    // 1) hit header-auth to set the cookie
-    fetch(`${chainlitHost}/chat/header-auth?email=${encodeURIComponent(username)}`, {
-      method: "GET",
-      credentials: "include",   // <= this is critical
-      redirect: "manual"        // we don't actually follow the 307 here
-    })
+    fetch(
+      `${chainlitHost}/chat/header-auth?email=${encodeURIComponent(
+        username
+      )}`,
+      {
+        method: "GET",
+        credentials: "include",
+        redirect: "manual",
+      }
+    )
       .then(() => setReady(true))
       .catch(console.error);
   }, [username]);
 
-  // 2) once ready, point iframe at the real Chainlit UI
-  const iframeSrc = ready
-    ? `${chainlitHost}/chainlit/`   // this is your mounted Chainlit app
-    : "about:blank";
+  const iframeSrc = ready ? `${chainlitHost}/chainlit` : "about:blank";
 
   return (
-    <>
+    <div className="chatbot-page">
       <Navbar />
-      <div style={{ marginTop: 60, height: "calc(100vh - 60px)" }}>
+      <div className="chatbot-content">
         <iframe
           id="chainlit-frame"
           src={iframeSrc}
           title="Chatbot"
-          style={{ width: "100%", height: "100%", border: "none" }}
-          sandbox="allow-scripts allow-same-origin"  // allow cookies & JS
+          sandbox="allow-scripts allow-same-origin"
         />
       </div>
-    </>
+    </div>
   );
 };
 
