@@ -1,146 +1,156 @@
+/* frontend/src/pages/ScreenerPage/ScreenerPage.css */
 @import '../../global.css';
 
 /* Screener Page Layout */
 .screener-page {
-    background-color: #f9f9f9; /* Light gray background for pages */
-    min-height: 100vh;
-    padding: 24px; /* Default spacing */
-
+  background-color: var(--color-background);
+  min-height: 100vh;
+  padding-top: calc(var(--navbar-height) + var(--spacing-large));
+  padding-right: var(--spacing-large);
+  padding-left: var(--spacing-large);
+  padding-bottom: var(--spacing-large);
+  box-sizing: border-box;
 }
 
-/* Market Cards */
-.market-cards {
-    margin-top: 8px;
-    padding: 16px 8px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 24px;
-    justify-content: center;
-}
+/* TradingView Widget */
 
-.market-card {
-    background-color: #ffffff; /* White background */
-    border-radius: 12px; /* Rounded corners */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Light shadow */
-    padding: 16px;
-    width: 400px;
-    box-sizing: border-box;
-    cursor: pointer;
-}
-
-.market-card:hover {
-    transform: translateY(-8px); /* Slight lift on hover */
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15); /* Slightly darker shadow */
-}
-
-/* Market Title and Values */
-.market-title {
-    font-size: 0.85rem;
-    color: #6c757d; /* Muted gray */
-    margin-bottom: 8px;
-    text-transform: uppercase;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-}
-
-.market-value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #333333; /* Dark text */
-}
-
-.market-change {
-    font-size: 0.85rem;
-    font-weight: 500;
-    margin-top: 8px;
-}
-
-.market-change.positive {
-    color: #28a745; /* Green for positive changes */
-}
-
-.market-change.negative {
-    color: #dc3545; /* Red for negative changes */
-}
-
-/* Screener Header */
-.screener-header {
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    padding: 8px;
-}
-
-.screener-header input {
-    border-radius: 8px;
-    font-size: 1rem; /* Base font size */
-    color: #444444; /* Default text color */
-    border: 1px solid #dcdfe6; /* Light border */
-}
-
-/* Screener Tabs */
-.screener-tabs {
-    margin-top: 0px;
-
-    padding: 16px;
-}
-
-
-/* Removed custom styles for Ant Design Tabs */
-.ant-tabs-tab {
-    font-size: 1rem !important; /* Increase font size */
-    font-weight: 600; /* Make the font bold */
-}
-
-
-/* Table Header */
-.ant-table-thead > tr > th {
-    font-size: 1rem !important;
-}
-
-/* Table Rows */
-.ant-table-tbody > tr > td {
-    font-size: 1rem !important; /* Increase font size */
-
+.tradingview-widget-container,
+.tradingview-widget-container__widget {
+  pointer-events: none !important;
 }
 
 .tradingview-widget-container {
-    margin-bottom: 8px;  /* adjust as you like */
-    margin-top: 48px;
-  }
-
-.tradingview-widget-copyright {
-display: none !important;
+  width: 100%;
+  height: auto;
+  margin: var(--spacing-medium) 0;
+}
+.tradingview-widget-container__widget {
+  width: 100% !important;
 }
 
+/* Ticker Overlay */
 .ticker-wrapper {
-    position: relative;
-    overflow: hidden;
-    background-color: #f9f9f9; /* same as page background */
-    pointer-events: none;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-background);
+}
+.ticker-overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 5%;
+  background-color: var(--color-background);
+  z-index: 2;
+  pointer-events: none;
+}
+.ticker-overlay-left { left: 0; }
+.ticker-overlay-right { right: 0; }
+
+/* Market Cards Container */
+.market-cards {
+  display: grid;
+  margin-top: var(--spacing-small);
+  padding: 0 var(--spacing-medium);
+  grid-template-columns: 1fr;           /* 1 column by default */
+  gap: var(--spacing-large);
+  justify-items: center;
+}
+
+/* 2 columns on small tablets and up */
+@media (min-width: 600px) {
+  .market-cards {
+    grid-template-columns: repeat(2, 1fr);
   }
-  
-  /* Overlay on both sides */
-  .ticker-overlay {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 5%;            /* covers 10% on each side */
-    background-color: #f9f9f9;
-    z-index: 2;
-    pointer-events: none;
+}
+
+/* 3 columns on tablets/desktop */
+@media (min-width: 900px) {
+  .market-cards {
+    grid-template-columns: repeat(3, 1fr);
   }
-  .ticker-overlay-left {
-    left: 0;
+}
+
+/* 4 columns on large desktops */
+@media (min-width: 1200px) {
+  .market-cards {
+    grid-template-columns: repeat(4, 1fr);
   }
-  .ticker-overlay-right {
-    right: 0;
-  }
-  
-  /* Ensure the widget is slightly wider & centered */
-  .tradingview-widget-container {
-    width: 130%;
-    margin-left: 0%;
-    margin-top: 48px;   /* adjust as needed below Navbar */
-    margin-bottom: 8px;
+}
+
+/* Individual Card */
+.market-card {
+  background-color: var(--color-white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow-medium);
+  padding: var(--spacing-medium);
+  width: 100%;    /* fills its grid cell */
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.market-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--box-shadow-hover);
+}
+
+/* Card Text */
+.market-title {
+  font-size: var(--font-size-small);
+  color: var(--color-secondary);
+  margin-bottom: var(--spacing-small);
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+.market-value {
+  font-size: var(--font-size-large);
+  font-weight: 700;
+  color: var(--color-black);
+}
+.market-change {
+  font-size: var(--font-size-small);
+  font-weight: 500;
+  margin-top: var(--spacing-small);
+}
+.market-change.positive { color: var(--color-success); }
+.market-change.negative { color: var(--color-error); }
+
+/* Screener Header & Search */
+.screener-header {
+  margin-bottom: var(--spacing-medium);
+  display: flex;
+  align-items: center;
+}
+.screener-header input {
+  width: 100%;
+  max-width: 20rem;  /* scales with root font size */
+  border-radius: 8px;
+  font-size: var(--font-size-base);
+  color: var(--color-dark-gray);
+  border: 1px solid var(--color-border);
+  margin-bottom: var(--spacing-medium);
+}
+
+/* Tabs Section */
+.screener-tabs {
+  margin-top: var(--spacing-large);
+  padding: var(--spacing-medium);
+  box-sizing: border-box;
+}
+.ant-tabs-tab {
+  font-size: var(--font-size-base) !important;
+  font-weight: 600;
+}
+
+/* Table Text */
+.ant-table-thead > tr > th {
+  font-size: var(--font-size-base) !important;
+}
+.ant-table-tbody > tr > td {
+  font-size: var(--font-size-base) !important;
+}
+
+.ant-table-thead > tr > th.no-wrap-header {
+    white-space: nowrap !important;
+
   }
