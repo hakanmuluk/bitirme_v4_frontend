@@ -19,3 +19,8 @@
     margin-bottom: 24px;
   }
   
+  .login-form {
+    width: 100%;
+    max-width: 18rem;   /* ~288px */
+    margin: 0 auto;     /* center it inside the container */
+  }
