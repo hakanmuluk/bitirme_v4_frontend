@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import { Menu, Drawer, Grid } from "antd";
 import {
   BarChartOutlined,
-  SettingOutlined,
   UserOutlined,
   MenuOutlined,
+  RobotOutlined,
+  ReadOutlined,
 } from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
@@ -44,7 +45,8 @@ const Navbar: React.FC = () => {
   };
 
   const items = [
-    { key: "chatbot", icon: <SettingOutlined />, label: "Chatbot" },
+    { key: "chatbot", icon: <RobotOutlined />, label: "Chatbot" },
+    { key: "news", icon: <ReadOutlined />, label: "News" },
     { key: "markets", icon: <BarChartOutlined />, label: "Markets" },
     {
       key: "profile",

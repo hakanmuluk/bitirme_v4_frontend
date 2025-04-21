@@ -1,53 +1,55 @@
 import React, { useEffect, useState } from "react";
-import { List, Card, Typography, Spin } from "antd";
+import { Card, Row, Col, Typography, Spin } from "antd";
 import axios from "axios";
 
-const { Title } = Typography;
+const { Title, Paragraph } = Typography;
 
-const FinanceNews = () => {
-    const [news, setNews] = useState([]);
-    const [loading, setLoading] = useState(true);
+interface NewsItem {
+  id: number;
+  title: string;
+  content: string;
+  image_url: string;
+  link: string;
+  published_at: string;
+}
 
-    useEffect(() => {
-        const fetchNews = async () => {
-            try {
-                const response = await axios.get("YOUR_YAHOO_FINANCE_NEWS_API_URL");
-                setNews(response.data.articles); // Adjust based on API response
-                setLoading(false);
-            } catch (error) {
-                console.error("Error fetching finance news:", error);
-                setLoading(false);
-            }
-        };
+const NewsPage: React.FC = () => {
+  const [news, setNews] = useState<NewsItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-        fetchNews();
-    }, []);
+  useEffect(() => {
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/news?limit=20`).then((res) => {
+      setNews(res.data);
+      setLoading(false);
+    });
+  }, []);
 
-    return (
-        <div style={{ padding: "20px", maxWidth: "800px", margin: "auto" }}>
-            <Title level={2}>Latest Finance News</Title>
+  if (loading) {
+    return <Spin size="large" style={{ display: "block", margin: "2rem auto" }} />;
+  }
 
-            {loading ? (
-                <Spin size="large" />
-            ) : (
-                <List
-                    grid={{ gutter: 16, column: 1 }}
-                    dataSource={news}
-                    renderItem={(item) => (
-                        <List.Item>
-                            <Card
-                                title={item.title}
-                                extra={<a href={item.url} target="_blank" rel="noopener noreferrer">Read More</a>}
-                                style={{ width: "100%" }}
-                            >
-                                <p>{item.description}</p>
-                            </Card>
-                        </List.Item>
-                    )}
-                />
-            )}
-        </div>
-    );
+  return (
+    <div style={{ padding: "24px" }}>
+      <Title level={2}>Latest News</Title>
+      <Row gutter={[16, 16]}>
+        {news.map((item) => (
+          <Col xs={24} md={12} lg={8} key={item.id}>
+            <Card
+              hoverable
+              cover={<img alt={item.title} src={item.image_url} />}
+              onClick={() => window.open(item.link, "_blank")}
+            >
+              <Title level={4}>{item.title}</Title>
+              <Paragraph ellipsis={{ rows: 3 }}>{item.content}</Paragraph>
+              <Paragraph type="secondary" style={{ fontSize: "12px" }}>
+                {new Date(item.published_at).toLocaleString()}
+              </Paragraph>
+            </Card>
+          </Col>
+        ))}
+      </Row>
+    </div>
+  );
 };
 
-export default FinanceNews;
+export default NewsPage;
