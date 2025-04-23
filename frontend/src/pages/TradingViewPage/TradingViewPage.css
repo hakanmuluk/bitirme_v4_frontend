@@ -1,25 +1,34 @@
 /* frontend/src/pages/TradingViewPage/TradingViewPage.css */
 @import '../../global.css'; /* for --navbar-height */
 
+/* push all content below the fixed navbar */
 .trading-view-page {
-  position: relative;              /* ← add this */
+  position: relative;
   padding-top: var(--navbar-height);
   height: 100vh;
   margin: 0;
   box-sizing: border-box;
 }
 
+/* chart fills from bottom of navbar to bottom of viewport */
 .chart-container {
   position: absolute;
   top: var(--navbar-height);
   bottom: 0;
   left: 0;
   right: 0;
+  z-index: 1;
 }
 
-/* Make the embed fill its parent */
-.tradingview-widget-container,
-.tradingview-widget-container__widget {
+/* ensure the embed wrapper spans full area */
+.tradingview-widget-container {
   width: 100%;
   height: 100%;
+}
+
+/* make the actual widget and its iframe fill the container */
+.tradingview-widget-container__widget,
+.tradingview-widget-container__widget iframe {
+  width: 100% !important;
+  height: 100% !important;
 }

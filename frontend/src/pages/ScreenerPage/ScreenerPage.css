@@ -14,8 +14,8 @@
 
 /* TradingView Widget */
 
-.tradingview-widget-container,
-.tradingview-widget-container__widget {
+.screener-page .tradingview-widget-container,
+.screener-page .tradingview-widget-container__widget {
   pointer-events: none !important;
 }
 
