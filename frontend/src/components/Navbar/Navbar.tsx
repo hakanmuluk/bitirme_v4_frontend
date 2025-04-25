@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Menu, Drawer, Grid } from "antd";
 import { MenuOutlined } from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router-dom";
+import {FileDoneOutlined} from "@ant-design/icons";
 import axios from "axios";
 
 const { useBreakpoint } = Grid;
@@ -18,6 +19,7 @@ const Navbar: React.FC = () => {
   else if (location.pathname.startsWith("/news")) activeKey = "news";
   else if (location.pathname.startsWith("/screener")) activeKey = "markets";
   else if (location.pathname.startsWith("/profile")) activeKey = "profile";
+  else if (location.pathname.startsWith("/reports")) activeKey = "reports";
 
   // Handle clicks (including logout)
   const handleMenuClick = async ({ key }: { key: string }) => {
@@ -35,6 +37,7 @@ const Navbar: React.FC = () => {
         news: "/news",
         markets: "/screener",
         profile: "/profile",
+        reports: "/reports",
       };
       if (routeMap[key]) navigate(routeMap[key]);
       setDrawerVisible(false);
@@ -48,6 +51,7 @@ const Navbar: React.FC = () => {
     { key: "markets", label: "Markets" },
     { key: "profile", label: "Profile" },
     { key: "profile-logout", label: "Logout" },
+    {key: "reports", icon: <FileDoneOutlined/>, label: "Reports"}
   ];
 
   return (

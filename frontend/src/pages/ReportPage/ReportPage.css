@@ -1,0 +1,131 @@
+.pdf-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px;
+    background-color: #f0f2f5;
+    min-height: 100vh;
+  }
+  
+  .pdf-container {
+    width: 100%;
+    max-width: 960px;
+    margin-top: 24px;
+    padding: 24px;
+    background: transparent;
+    box-shadow: none;
+  }
+  
+  .pdf-container .ant-typography {
+    text-align: center;
+    width: 100%;
+    margin-bottom: 24px;
+  }
+  
+  .ant-row {
+    width: 100%;
+  }
+  .ant-col {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+  }
+  
+  /* Card styling */
+  .report-card,
+  .ant-card {
+    width: 240px;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background: #fff;
+  }
+  .report-card:hover,
+  .ant-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+  }
+  
+  /* Remove padding between cover and actions */
+  .report-card .ant-card-cover,
+  .report-card .ant-card-body,
+  .ant-card-body {
+    padding: 0;
+    margin: 0;
+  }
+  
+  .report-iframe {
+    width: 100%;
+    height: 340px; /* increased height */
+    border: none;
+    display: block;
+  }
+  
+  /* Action buttons area: transparent background and no border-top */
+  .ant-card-actions {
+    background: transparent;
+    border-top: none;
+    padding-bottom: 8px;
+  }
+  .ant-card-actions .ant-btn-link {
+    background: transparent!important;
+    border: none!important;
+    color: #1890ff!important;
+    padding: 6px 12px!important;
+    font-weight: 500;
+  }
+  .ant-card-actions .ant-btn-link:hover {
+    background: rgba(24, 144, 255, 0.1)!important;
+  }
+  
+  /* Button container: keep minimal spacing */
+  .report-card .ant-card-actions {
+    margin-top: 0;
+  }
+  
+  /* Title text inside card */
+  .ant-card-meta-title {
+    font-size: 1rem;
+    font-weight: 500;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .filename-display {
+    padding: 8px;
+    background-color: rgba(0, 0, 0, 0.03);
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .preview-small {
+    height: 200px;
+    width: 100%;
+    border: none;
+  }
+
+.pdf-container .ant-input-affix-wrapper {
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.pdf-container .ant-input-affix-wrapper:hover {
+  border-color: #40a9ff;
+}
+
+.preview-placeholder {
+  height: 200px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+  border-radius: 4px;
+}
