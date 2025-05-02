@@ -50,7 +50,7 @@ const Navbar: React.FC = () => {
     { key: "news", label: "News" },
     { key: "markets", label: "Markets" },
     //{ key: "profile", label: "Profile" },
-    {key: "reports", icon: <FileDoneOutlined/>, label: "Reports"},
+    {key: "reports", label: "Reports"},
     { key: "profile-logout", label: "Logout" }
   ];
 

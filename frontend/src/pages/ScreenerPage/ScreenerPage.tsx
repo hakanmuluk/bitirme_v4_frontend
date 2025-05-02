@@ -1,4 +1,3 @@
-// frontend/src/pages/ScreenerPage/ScreenerPage.tsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Table, Tabs, Input, Spin } from "antd";
@@ -7,49 +6,12 @@ import { StarOutlined, StarFilled, SearchOutlined } from "@ant-design/icons";
 import Navbar from "../../components/Navbar/Navbar";
 import type { ColumnsType } from "antd/es/table";
 import { useNavigate } from "react-router-dom";
-import "./ScreenerPage.css";
 
 const { TabPane } = Tabs;
 const API_BASE = "https://investmenthelper-ai-backend.up.railway.app";
 
-const fallbackMarketData = [
-  {
-    name: "S&P 500",
-    value: "5,648.40",
-    change: "+0.44%",
-    graphData: [
-      { value: 5600 },
-      { value: 5625 },
-      { value: 5648 },
-      { value: 5640 },
-      { value: 5650 },
-    ],
-  },
-  {
-    name: "Nasdaq 100",
-    value: "17,713.53",
-    change: "+1.13%",
-    graphData: [
-      { value: 17600 },
-      { value: 17680 },
-      { value: 17713 },
-      { value: 17700 },
-      { value: 17750 },
-    ],
-  },
-  {
-    name: "VIX",
-    value: "15.00",
-    change: "-4.15%",
-    graphData: [
-      { value: 16.5 },
-      { value: 15.8 },
-      { value: 15.0 },
-      { value: 14.9 },
-      { value: 14.5 },
-    ],
-  },
-];
+
+
 
 const ScreenerPage: React.FC = () => {
   const [stockData, setStockData] = useState<any[]>([]);
@@ -139,6 +101,7 @@ const ScreenerPage: React.FC = () => {
           month: item.monthChange * 100,
           year: item.yearChange * 100,
         }));
+        console.log(withKeys);
         setStockData(withKeys);
         setFilteredData(withKeys);
       })
@@ -250,7 +213,6 @@ const ScreenerPage: React.FC = () => {
       key: "fav",
       width: 120,
       align: "center",
-      className: "no-wrap-header", 
       render: (_, rec) => {
         const fav = favorites.includes(rec.ticker);
         const Icon = fav ? StarFilled : StarOutlined;
@@ -280,23 +242,43 @@ const ScreenerPage: React.FC = () => {
   );
 
   return (
-    <div className="screener-page">
+    <div style={{
+      backgroundColor: "#f5f7fa",
+      minHeight: "100vh",
+      paddingTop: 64,
+      padding: 24,
+      boxSizing: "border-box",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center"
+    }}>
       <Navbar />
 
       {/* TradingView */}
-      <div className="ticker-wrapper">
-        <div className="ticker-overlay ticker-overlay-left" />
-        <div
-          id="tradingview-widget-container"
-          className="tradingview-widget-container"
-        >
-          <div className="tradingview-widget-container__widget" />
-        </div>
-        <div className="ticker-overlay ticker-overlay-right" />
-      </div>
+      <div
+        id="tradingview-widget-container"
+        style={{
+          position: "fixed",
+          top: 64,
+          left: 0,
+          right: 0,
+          maxWidth: 1200,
+          height: 60,
+          margin: "0 auto",
+          zIndex: 1000
+        }}
+      />
 
       {/* Market Cards */}
-      <div className="market-cards">
+      <div style={{
+        width: "100%",
+        maxWidth: 1200,
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+        gap: 16,
+        margin: "16px 0",
+        paddingTop: 80
+      }}>
   {loadingCurrency ? (
     <Spin />
   ) : (
@@ -307,13 +289,27 @@ const ScreenerPage: React.FC = () => {
         : "var(--color-success)"; // green for positive
 
       return (
-        <div key={idx} className="market-card">
-          <div className="market-title">{item.name}</div>
-          <div className="market-value">{item.value}</div>
+        <div key={idx} style={{
+          backgroundColor: "#fff",
+          borderRadius: 8,
+          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          padding: 16,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          transition: "transform 0.2s",
+          cursor: "pointer"
+        }}
+          onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.03)")}
+          onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
+        >
+          <div>{item.name}</div>
+          <div>{item.value}</div>
           <div
-            className={`market-change ${
-              item.change.startsWith("-") ? "negative" : "positive"
-            }`}
+            style={{
+              color: item.change.startsWith("-") ? "red" : "green",
+              fontWeight: "bold"
+            }}
           >
             {item.change}
           </div>
@@ -337,15 +333,26 @@ const ScreenerPage: React.FC = () => {
 
 
       {/* Screener Tabs */}
-      <div className="screener-tabs">
+      <div style={{ width: "100%", maxWidth: 1200, margin: "16px auto" }}>
         <Tabs defaultActiveKey="1">
           <TabPane tab="Companies" key="1">
             <Spin spinning={tableLoading}>
-              <div className="screener-header">
+              <div style={{
+                width: "100%",
+                maxWidth: 1200,
+                margin: "16px auto",
+                padding: 8,
+                backgroundColor: "#fff",
+                borderRadius: 8,
+                boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
+                display: "flex",
+                justifyContent: "center"
+              }}>
                 <Input
                   placeholder="Search..."
                   prefix={<SearchOutlined />}
                   onChange={(e) => onSearch(e.target.value)}
+                  style={{ width: "100%", maxWidth: 400 }}
                 />
               </div>
               <Table
@@ -365,19 +372,30 @@ const ScreenerPage: React.FC = () => {
           </TabPane>
           <TabPane tab="My Favorites" key="2">
             <Spin spinning={tableLoading}>
-              <div className="screener-header">
+              <div style={{
+                width: "100%",
+                maxWidth: 1200,
+                margin: "16px auto",
+                padding: 8,
+                backgroundColor: "#fff",
+                borderRadius: 8,
+                boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
+                display: "flex",
+                justifyContent: "center"
+              }}>
                 <Input
                   placeholder="Search favorites..."
                   prefix={<SearchOutlined />}
                   value={favoriteSearch}
                   onChange={(e) => setFavoriteSearch(e.target.value)}
+                  style={{ width: "100%", maxWidth: 400 }}
                 />
               </div>
               <Table
                 columns={columns}
                 dataSource={filteredFavoriteRows}
                 loading={tableLoading}
-                scroll={{ x: 'max-content', y: 400 }} 
+                scroll={{ x: 'max-content', y: 400 }}
                 pagination={false}
                 rowKey="key"
                 sticky
