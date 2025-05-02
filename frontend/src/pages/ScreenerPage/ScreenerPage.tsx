@@ -163,7 +163,7 @@ const ScreenerPage: React.FC = () => {
     {
       title: "Price",
       dataIndex: "price",
-      render: (p: number) => `$${p.toFixed(2)}`,
+      render: (p: number) => `${p.toFixed(2)} TL`,
     },
     {
       title: "1D %",
