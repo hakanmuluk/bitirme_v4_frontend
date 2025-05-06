@@ -179,6 +179,38 @@ const ScreenerPage: React.FC = () => {
 
   const navigate = useNavigate();
 
+    useEffect(() => {
+    const container = document.getElementById("tradingview-widget-container");
+    if (!container || container.dataset.loaded) return;
+    container.dataset.loaded = "true";
+
+    const script = document.createElement("script");
+    script.src =
+      "https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js";
+    script.async = true;
+    script.text = JSON.stringify({
+      symbols: [
+        { description: "Bitcoin/TL", proName: "BINANCE:BTCTRY" },
+        { description: "Ethereum/TL", proName: "OKX:ETHTRY" },
+        { description: "Gold/TL", proName: "FX_IDC:XAUTRY" },
+        { description: "Silver/TL", proName: "FX_IDC:XAGTRY" },
+        { description: "Brent Oil", proName: "CAPITALCOM:OIL_BRENT" },
+        { description: "BIST Banking Index", proName: "BIST:XBANK" },
+        { description: "BIST Industrial Index", proName: "BIST:XUSIN" },
+        { description: "BIST Technology Index", proName: "BIST:XUTEK" }
+      ],
+      showSymbolLogo: true,
+      isTransparent: false,
+      autosize: true,
+      displayMode: "regular",
+      width: "100%",
+      height: "100%",
+      colorTheme: "light",
+      locale: "en"
+    });
+    container.appendChild(script);
+  }, []);
+
   // Fetch favorites on mount
   useEffect(() => {
     axios
@@ -284,6 +316,20 @@ const ScreenerPage: React.FC = () => {
   return (
     <div style={{ backgroundColor: "#f5f7fa", minHeight: "100vh", paddingTop: 64, padding: 24, boxSizing: "border-box", display: "flex", flexDirection: "column", alignItems: "center" }}>
       <Navbar />
+
+      <div
+        id="tradingview-widget-container"
+        style={{
+          position: "fixed",
+          top: 64,
+          left: 0,
+          right: 0,
+          maxWidth: 1200,
+          height: 60,
+          margin: "0 auto",
+          zIndex: 1000
+        }}
+      />
 
       {/* Market Cards */}
       <div style={{ width: "100%", maxWidth: 1200, display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 16, margin: "16px 0", paddingTop: 80 }}>
