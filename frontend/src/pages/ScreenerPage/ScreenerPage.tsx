@@ -14,31 +14,31 @@ const hardcodedStockData = [
     key: 1,
     company: "Turkcell İletişim Hizmetleri A.Ş.",
     ticker: "TCELL.IS",
-    price: 18.75,
-    day: 0.50,
-    month: 2.30,
-    year: 10.50,
-    marketCap: "35B"
+    price: 87.80,
+    day: 1.50,
+    month: -4.82,
+    year: 7.13,
+    marketCap: "194,51B"
   },
   {
     key: 2,
     company: "Akbank T.A.Ş.",
     ticker: "AKBNK.IS",
-    price: 7.25,
-    day: -0.30,
-    month: 4.10,
-    year: 12.00,
-    marketCap: "50B"
+    price: 49,72,
+    day: 2.39,
+    month: -5,35,
+    year: -17,10,
+    marketCap: "257,40B"
   },
   {
     key: 3,
     company: "Koç Holding A.Ş.",
     ticker: "KCHOL.IS",
-    price: 110.50,
-    day: 1.20,
-    month: 6.50,
-    year: 15.00,
-    marketCap: "100B"
+    price: 136,
+    day: 0.81,
+    month: -16.45,
+    year: -41.86,
+    marketCap: "350.97B"
   }
 ];
 
