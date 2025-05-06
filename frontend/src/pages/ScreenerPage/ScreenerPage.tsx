@@ -24,11 +24,11 @@ const hardcodedStockData = [
     key: 2,
     company: "Akbank T.A.Ş.",
     ticker: "AKBNK.IS",
-    price: 49,72,
+    price: 49.72,
     day: 2.39,
-    month: -5,35,
-    year: -17,10,
-    marketCap: "257,40B"
+    month: -5.35,
+    year: -17.10,
+    marketCap: "257.40B"
   },
   {
     key: 3,
