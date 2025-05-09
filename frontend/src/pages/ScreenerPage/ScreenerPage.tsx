@@ -56,7 +56,7 @@ const ScreenerPage: React.FC = () => {
 
   useEffect(() => {
     setStocksLoading(true);
-    axios.get(`${API_BASE}/api/stocks`)
+    axios.get(`${API_BASE}/api/stocks/`)
       .then(res => {
         // Filter out items with error before mapping
         const validItems = res.data.filter((item: any) => !item.error);
@@ -83,7 +83,7 @@ const ScreenerPage: React.FC = () => {
 
   useEffect(() => {
     setCurrencyLoading(true);
-    axios.get(`${API_BASE}/api/currency`)
+    axios.get(`${API_BASE}/api/currency/`)
       .then(res => {
         // Interpret arr so that arr[0] is oldest, arr[arr.length-1] is newest
         // Compute 7-day change percent using the newest and the value 7 days ago (or oldest)
