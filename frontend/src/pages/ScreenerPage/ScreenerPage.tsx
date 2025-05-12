@@ -1,75 +1,29 @@
-// frontend/src/pages/ScreenerPage/ScreenerPage.tsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Table, Tabs, Input, Spin } from "antd";
-import { LineChart, Line, ResponsiveContainer, YAxis } from "recharts";
+import { Table, Tabs, Input, Spin, Skeleton } from "antd";
+import { LineChart, Line, ResponsiveContainer, YAxis, Tooltip, XAxis } from "recharts";
 import { StarOutlined, StarFilled, SearchOutlined } from "@ant-design/icons";
 import Navbar from "../../components/Navbar/Navbar";
 import type { ColumnsType } from "antd/es/table";
 import { useNavigate } from "react-router-dom";
-import "./ScreenerPage.css";
 
 const { TabPane } = Tabs;
 const API_BASE = "https://investmenthelper-ai-backend.up.railway.app";
 
-const fallbackMarketData = [
-  {
-    name: "S&P 500",
-    value: "5,648.40",
-    change: "+0.44%",
-    graphData: [
-      { value: 5600 },
-      { value: 5625 },
-      { value: 5648 },
-      { value: 5640 },
-      { value: 5650 },
-    ],
-  },
-  {
-    name: "Nasdaq 100",
-    value: "17,713.53",
-    change: "+1.13%",
-    graphData: [
-      { value: 17600 },
-      { value: 17680 },
-      { value: 17713 },
-      { value: 17700 },
-      { value: 17750 },
-    ],
-  },
-  {
-    name: "VIX",
-    value: "15.00",
-    change: "-4.15%",
-    graphData: [
-      { value: 16.5 },
-      { value: 15.8 },
-      { value: 15.0 },
-      { value: 14.9 },
-      { value: 14.5 },
-    ],
-  },
-];
-
 const ScreenerPage: React.FC = () => {
   const [stockData, setStockData] = useState<any[]>([]);
   const [filteredData, setFilteredData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
   const [currencyCards, setCurrencyCards] = useState<any[]>([]);
-  const [loadingCurrency, setLoadingCurrency] = useState(true);
-
   const [favorites, setFavorites] = useState<string[]>([]);
   const [favoritesLoading, setFavoritesLoading] = useState(true);
   const [favoriteSearch, setFavoriteSearch] = useState("");
+  const [stocksLoading, setStocksLoading] = useState<boolean>(true);
+  const [currencyLoading, setCurrencyLoading] = useState<boolean>(true);
 
   const navigate = useNavigate();
 
-  // Inject TradingView ticker
   useEffect(() => {
-    const container = document.getElementById(
-      "tradingview-widget-container"
-    );
+    const container = document.getElementById("tradingview-widget-container");
     if (!container || container.dataset.loaded) return;
     container.dataset.loaded = "true";
 
@@ -86,7 +40,7 @@ const ScreenerPage: React.FC = () => {
         { description: "Brent Oil", proName: "CAPITALCOM:OIL_BRENT" },
         { description: "BIST Banking Index", proName: "BIST:XBANK" },
         { description: "BIST Industrial Index", proName: "BIST:XUSIN" },
-        { description: "BIST Technology Index", proName: "BIST:XUTEK" },
+        { description: "BIST Technology Index", proName: "BIST:XUTEK" }
       ],
       showSymbolLogo: true,
       isTransparent: false,
@@ -95,25 +49,90 @@ const ScreenerPage: React.FC = () => {
       width: "100%",
       height: "100%",
       colorTheme: "light",
-      locale: "en",
+      locale: "en"
     });
     container.appendChild(script);
   }, []);
 
-  // Fetch favorites
+  useEffect(() => {
+    setStocksLoading(true);
+    axios.get(`${API_BASE}/api/stocks/`)
+      .then(res => {
+        // Filter out items with error before mapping
+        const validItems = res.data.filter((item: any) => !item.error);
+        // Map API fields to table format
+        const stocks = validItems.map((item: any, idx: number) => ({
+          key: idx + 1,
+          company: item.company,
+          ticker: `${item.ticker}.IS`,
+          price: item.price,
+          day: item.dayChange,
+          month: item.monthChange,
+          year: item.ytdChange,
+          marketCap: item.marketCap
+        }));
+        setFilteredData(stocks);
+        setStockData(stocks);
+        setStocksLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setStocksLoading(false);
+      });
+  }, []);
+
+  useEffect(() => {
+    setCurrencyLoading(true);
+    axios.get(`${API_BASE}/api/currency/`)
+      .then(res => {
+        // Interpret arr so that arr[0] is oldest, arr[arr.length-1] is newest
+        // Compute 7-day change percent using the newest and the value 7 days ago (or oldest)
+        const cards = Object.entries(res.data as Record<string, number[]>).map(([symbol, arr]) => {
+          const oldest = arr[0] ?? 0;
+          const newest = arr[arr.length - 1] ?? oldest;
+          // 7 days ago: if not enough data, fallback to oldest
+          const sevenDaysAgo = arr[arr.length - 1 - 6] ?? oldest;
+          const changePercent = sevenDaysAgo !== 0
+            ? ((newest - sevenDaysAgo) / sevenDaysAgo * 100).toFixed(2)
+            : "0.00";
+          // Use original series order for sparkline with dates
+          const graphData = arr.map((val, idx) => {
+            // idx 0 is oldest, so date is today minus (arr.length - 1 - idx) days
+            const date = new Date();
+            date.setDate(date.getDate() - (arr.length - 1 - idx));
+            return {
+              date: date.toISOString().split('T')[0], // YYYY-MM-DD
+              value: val
+            };
+          });
+          return {
+            name: symbol,
+            value: newest.toFixed(4),
+            change: `${changePercent}%`,
+            graphData
+          };
+        });
+        setCurrencyCards(cards);
+        setCurrencyLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setCurrencyLoading(false);
+      });
+  }, []);
+
+  // Fetch favorites on mount
   useEffect(() => {
     axios
       .get(`${API_BASE}/api/favorites/get`, { withCredentials: true })
-      .then((res) => setFavorites(res.data.favoriteCompanies || []))
+      .then(res => setFavorites(res.data.favoriteCompanies || []))
       .catch(console.error)
       .finally(() => setFavoritesLoading(false));
   }, []);
 
-  // Toggle favorite
+  // Toggle favorite via API
   const toggleFavorite = async (ticker: string) => {
-    const endpoint = favorites.includes(ticker)
-      ? "/api/favorites/remove"
-      : "/api/favorites/add";
+    const endpoint = favorites.includes(ticker) ? "/api/favorites/remove" : "/api/favorites/add";
     try {
       const res = await axios.post(
         `${API_BASE}${endpoint}`,
@@ -126,63 +145,46 @@ const ScreenerPage: React.FC = () => {
     }
   };
 
-  // Fetch stocks
-  useEffect(() => {
-    setLoading(true);
-    axios
-      .get(`${API_BASE}/api/stocks/`)
-      .then((res) => {
-        const withKeys = res.data.map((item: any, i: number) => ({
-          ...item,
-          key: i + 1,
-          day: item.dayChange,
-          month: item.monthChange * 100,
-          year: item.yearChange * 100,
-        }));
-        setStockData(withKeys);
-        setFilteredData(withKeys);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
-
-  // Fetch currency cards
-  useEffect(() => {
-    setLoadingCurrency(true);
-    axios
-      .get(`${API_BASE}/api/currency/`)
-      .then((res) => {
-        const cards: any[] = [];
-        Object.entries(res.data).forEach(([ticker, prices]) => {
-          if (!Array.isArray(prices) || prices.length === 0) return;
-          const first = prices[0] as number;
-          const last = (prices as number[]).slice(-1)[0];
-          const changePct = ((last - first) / first) * 100;
-          cards.push({
-            name: ticker,
-            value: last.toFixed(2),
-            change: `${changePct >= 0 ? "+" : ""}${changePct.toFixed(2)}%`,
-            graphData: (prices as number[]).map((v) => ({ value: v })),
-          });
-        });
-        setCurrencyCards(cards.length ? cards : fallbackMarketData);
-      })
-      .catch(console.error)
-      .finally(() => setLoadingCurrency(false));
-  }, []);
-
+  // Navigate to TradingView when clicking a row
   const handleRowClick = (rec: any) => {
     navigate(`/tradingView/${rec.ticker}`);
   };
 
+  // Filter companies by search term
   const onSearch = (v: string) => {
     setFilteredData(
-      stockData.filter((item) =>
+      stockData.filter(item =>
         item.company.toLowerCase().includes(v.toLowerCase())
       )
     );
   };
 
+  const CustomTooltip = ({ active, payload, label, coordinate }: any) => {
+    if (active && payload && payload.length && coordinate) {
+      return (
+        <div
+          style={{
+            position: 'absolute',
+            left: coordinate.x,
+            top: coordinate.y - 30,
+            backgroundColor: 'rgba(255,255,255,0.7)',
+            padding: '4px 8px',
+            borderRadius: 8,
+            boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+            pointerEvents: 'none',
+            fontSize: '0.7rem',
+            whiteSpace: 'nowrap'
+          }}
+        >
+          <div>{label}</div>
+          <div>{`Value: ${payload[0].value.toFixed(4)}`}</div>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  // Table columns definition
   const columns: ColumnsType<any> = [
     { title: "#", dataIndex: "key", width: 50 },
     {
@@ -195,54 +197,35 @@ const ScreenerPage: React.FC = () => {
             {rec.ticker}
           </div>
         </div>
-      ),
+      )
     },
-    {
-      title: "Price",
-      dataIndex: "price",
-      render: (p: number) => `$${p.toFixed(2)}`,
-    },
+    { title: "Price", dataIndex: "price", render: (p: number) => `${p.toFixed(2)} TL` },
     {
       title: "1D %",
       dataIndex: "day",
       render: (v: number) => (
-        <span
-          style={{
-            color: v >= 0 ? "green" : "red",
-            fontWeight: "bold",
-          }}
-        >
+        <span style={{ color: v >= 0 ? "green" : "red", fontWeight: "bold" }}>
           {v >= 0 ? `+${v.toFixed(2)}%` : `${v.toFixed(2)}%`}
         </span>
-      ),
+      )
     },
     {
       title: "1M %",
       dataIndex: "month",
       render: (v: number) => (
-        <span
-          style={{
-            color: v >= 0 ? "green" : "red",
-            fontWeight: "bold",
-          }}
-        >
+        <span style={{ color: v >= 0 ? "green" : "red", fontWeight: "bold" }}>
           {v >= 0 ? `+${v.toFixed(2)}%` : `${v.toFixed(2)}%`}
         </span>
-      ),
+      )
     },
     {
       title: "YTD %",
       dataIndex: "year",
       render: (v: number) => (
-        <span
-          style={{
-            color: v >= 0 ? "green" : "red",
-            fontWeight: "bold",
-          }}
-        >
+        <span style={{ color: v >= 0 ? "green" : "red", fontWeight: "bold" }}>
           {v >= 0 ? `+${v.toFixed(2)}%` : `${v.toFixed(2)}%`}
         </span>
-      ),
+      )
     },
     { title: "M Cap", dataIndex: "marketCap" },
     {
@@ -250,143 +233,90 @@ const ScreenerPage: React.FC = () => {
       key: "fav",
       width: 120,
       align: "center",
-      className: "no-wrap-header", 
       render: (_, rec) => {
         const fav = favorites.includes(rec.ticker);
         const Icon = fav ? StarFilled : StarOutlined;
         return (
-          <Icon
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleFavorite(rec.ticker);
-            }}
-            style={{
-              fontSize: 16,
-              color: fav ? "#faad14" : "#aaa",
-              cursor: "pointer",
-            }}
-          />
+          <Spin spinning={favoritesLoading}>
+            <Icon
+              onClick={e => { e.stopPropagation(); toggleFavorite(rec.ticker); }}
+              style={{ fontSize: 16, color: fav ? "#faad14" : "#aaa", cursor: "pointer" }}
+            />
+          </Spin>
         );
-      },
-    },
+      }
+    }
   ];
 
-  const tableLoading = loading || favoritesLoading;
-  const favoriteRows = stockData.filter((x) =>
-    favorites.includes(x.ticker)
-  );
-  const filteredFavoriteRows = favoriteRows.filter((x) =>
-    x.company.toLowerCase().includes(favoriteSearch.toLowerCase())
-  );
-
   return (
-    <div className="screener-page">
+    <div style={{ backgroundColor: "#f5f7fa", minHeight: "100vh", paddingTop: 64, padding: 24, boxSizing: "border-box", display: "flex", flexDirection: "column", alignItems: "center" }}>
       <Navbar />
 
-      {/* TradingView */}
-      <div className="ticker-wrapper">
-        <div className="ticker-overlay ticker-overlay-left" />
-        <div
-          id="tradingview-widget-container"
-          className="tradingview-widget-container"
-        >
-          <div className="tradingview-widget-container__widget" />
-        </div>
-        <div className="ticker-overlay ticker-overlay-right" />
-      </div>
+      <div
+        id="tradingview-widget-container"
+        style={{
+          position: "fixed",
+          top: 64,
+          left: 0,
+          right: 0,
+          maxWidth: 1200,
+          height: 60,
+          margin: "0 auto",
+          zIndex: 1000
+        }}
+      />
 
       {/* Market Cards */}
-      <div className="market-cards">
-  {loadingCurrency ? (
-    <Spin />
-  ) : (
-    currencyCards.map((item, idx) => {
-      // Determine line color based on price change
-      const lineColor = item.change.startsWith("-")
-        ? "var(--color-error)"    // red for negative
-        : "var(--color-success)"; // green for positive
-
-      return (
-        <div key={idx} className="market-card">
-          <div className="market-title">{item.name}</div>
-          <div className="market-value">{item.value}</div>
-          <div
-            className={`market-change ${
-              item.change.startsWith("-") ? "negative" : "positive"
-            }`}
-          >
-            {item.change}
-          </div>
-          <ResponsiveContainer width="100%" height={80}>
-            <LineChart data={item.graphData}>
-              <YAxis hide domain={["dataMin - 1", "dataMax + 1"]} />
-              <Line
-                type="monotone"
-                dataKey="value"
-                dot={false}
-                strokeWidth={2}
-                stroke={lineColor}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+      {currencyLoading ? (
+        <Skeleton active paragraph={{ rows: 4 }} />
+      ) : (
+        <div style={{ width: "100%", maxWidth: 1200, display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 16, margin: "16px 0", paddingTop: 80 }}>
+          {currencyCards.map((item, idx) => {
+            const lineColor = item.change.startsWith("-") ? "var(--color-error)" : "var(--color-success)";
+            return (
+              <div key={idx} style={{ backgroundColor: "#fff", borderRadius: 8, boxShadow: "0 2px 8px rgba(0,0,0,0.1)", padding: 16, display: "flex", flexDirection: "column", alignItems: "center", transition: "transform 0.2s", cursor: "pointer" }}>
+                <div>{item.name}</div>
+                <div>{item.value}</div>
+                <div style={{ color: item.change.startsWith("-") ? "red" : "green", fontWeight: "bold" }}>
+                  {item.change}
+                </div>
+                <ResponsiveContainer width="100%" height={80}>
+                  <LineChart data={item.graphData}>
+                    <XAxis dataKey="date" hide={true} />
+                    <YAxis
+                      hide
+                      domain={["auto", "auto"]}
+                    />
+                    <Line type="monotone" dataKey="value" dot={false} strokeWidth={2} stroke={lineColor} />
+                    <Tooltip
+                      content={<CustomTooltip />}
+                      cursor={false}
+                      wrapperStyle={{ overflow: 'visible' }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            );
+          })}
         </div>
-      );
-    })
-  )}
-</div>
-
+      )}
 
       {/* Screener Tabs */}
-      <div className="screener-tabs">
+      <div style={{ width: "100%", maxWidth: 1200, margin: "16px auto" }}>
         <Tabs defaultActiveKey="1">
           <TabPane tab="Companies" key="1">
-            <Spin spinning={tableLoading}>
-              <div className="screener-header">
-                <Input
-                  placeholder="Search..."
-                  prefix={<SearchOutlined />}
-                  onChange={(e) => onSearch(e.target.value)}
-                />
-              </div>
-              <Table
-                columns={columns}
-                dataSource={filteredData}
-                loading={tableLoading}
-                scroll={{ x: 'max-content', y: 400 }}
-                pagination={false}
-                rowKey="key"
-                sticky
-                onRow={(rec) => ({
-                  onClick: () => handleRowClick(rec),
-                  style: { cursor: "pointer" },
-                })}
-              />
+            <div style={{ width: "100%", maxWidth: 1200, margin: "16px auto", padding: 8, backgroundColor: "#fff", borderRadius: 8, boxShadow: "0 1px 4px rgba(0,0,0,0.1)", display: "flex", justifyContent: "center" }}>
+              <Input placeholder="Search..." prefix={<SearchOutlined />} onChange={e => onSearch(e.target.value)} style={{ width: "100%", maxWidth: 400 }} />
+            </div>
+            <Spin spinning={stocksLoading}>
+              <Table columns={columns} dataSource={filteredData} pagination={false} rowKey="key" sticky onRow={rec => ({ onClick: () => handleRowClick(rec), style: { cursor: "pointer" } })} scroll={{ x: 'max-content', y: 400 }} />
             </Spin>
           </TabPane>
           <TabPane tab="My Favorites" key="2">
-            <Spin spinning={tableLoading}>
-              <div className="screener-header">
-                <Input
-                  placeholder="Search favorites..."
-                  prefix={<SearchOutlined />}
-                  value={favoriteSearch}
-                  onChange={(e) => setFavoriteSearch(e.target.value)}
-                />
-              </div>
-              <Table
-                columns={columns}
-                dataSource={filteredFavoriteRows}
-                loading={tableLoading}
-                scroll={{ x: 'max-content', y: 400 }} 
-                pagination={false}
-                rowKey="key"
-                sticky
-                onRow={(rec) => ({
-                  onClick: () => handleRowClick(rec),
-                  style: { cursor: "pointer" },
-                })}
-              />
-            </Spin>
+            <div style={{ width: "100%", maxWidth: 1200, margin: "16px auto", padding: 8, backgroundColor: "#fff", borderRadius: 8, boxShadow: "0 1px 4px rgba(0,0,0,0.1)", display: "flex", justifyContent: "center" }}>
+              <Input placeholder="Search favorites..." prefix={<SearchOutlined />} value={favoriteSearch} onChange={e => setFavoriteSearch(e.target.value)} style={{ width: "100%", maxWidth: 400 }} />
+            </div>
+            <Table columns={columns} dataSource={filteredData.filter(x => favorites.includes(x.ticker) && x.company.toLowerCase().includes(favoriteSearch.toLowerCase()))} pagination={false} rowKey="key" sticky onRow={rec => ({ onClick: () => handleRowClick(rec), style: { cursor: "pointer" } })} scroll={{ x: 'max-content', y: 400 }} />
           </TabPane>
         </Tabs>
       </div>
